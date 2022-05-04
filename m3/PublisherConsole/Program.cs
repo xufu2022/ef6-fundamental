@@ -9,5 +9,6 @@ QueryFilter();
 
 void QueryFilter()
 {
+    //must have a deterministic sort order
     var authors = context.Authors.LastOrDefault(a=>a.LastName=="Lerman");
 }
