@@ -46,3 +46,82 @@ scaffold-dbcontext (connectionstring with quote) Microsoft.EntityFrameworkCore.S
     override dispose method to close streamwriter
 
     override encoding on console (github.com/julielerman/efcoreencodingdemo)
+
+# Eager loading Related Data in queries
+
+    var authors = _context.Authors
+        .Include(a => a.Books
+                       .Where(b => b.PublishDate >= pubDateStart)
+                       .OrderBy(b => b.Title))
+        .ToList();
+    
+    var authors = _context.Authors
+        .Include(a => a.Books.BookJackets).ToList() //get the jackets for each authors' books <b>but don't get the books</b>
+
+    include defaults to a single Sql command. use AsSplitQuery() to send multiple sql commands instead
+
+## loading related data for objects
+
+-   load collection
+    _context.Entry(author).Collection(a=>a.Books).load()
+-   load reference
+    _context.Entry(book).Reference(a=>a.Author).load()
+-   Filter on loading
+    _context.Entry(author).Collection(a=>a.Books).Query().Where(b=>b.Title.Contains("newF")).ToList()
+
+## Lazy loading
+
+    off by default
+-   Enable Lazy loading
+    -   every navigation properety in every entity must be virtual
+    -   reference Microsoft.EntityFramework.Proxy package
+    -   Use the proxy logic provided by the package
+        optionsBuilder.UseLazyLoadingProxies()
+
+-   Pro and Cons
+    -   pros:
+        -   one command sent to db to get the authors' books
+    -   cons:
+        -   retrieve all books objects from db and materialize them to give the count
+            var bookcount=author.Books.Count()
+        -   send N+1 comamnds to db as each author's book is loaded into gridview
+        -   No data is retrieved (disposed context return no data )
+    
+## using related data to filter objects
+
+    var authors = _context.Authors.Where(a=>a.Books.Any(b=>b.pYear.Year>2015)).ToList()
+
+## modify related data
+    _context.ChangeTracker.DetectChanges()
+    var state=_context.ChangeTracker.DebugView.ShortView
+
+-   Update method updates all the objects in a graph,
+-   unless they have no key values.. those are "added"
+
+-   attach start tracking with state set to unchanged
+-   _context.Entry(object).State has more control
+
+## Delete object from graph
+
+-   Delete Rule: Cascade (no orphan) which enforce by EF core
+    Any related data that is also tracked will be marked as Deleted along with the principal object
+
+-   QA Cascade Deletet:
+    -   remove() remove will only remove the specific object
+    -   delete dependent not in graph -- Just Call DbSet.Remove method
+    -   move child from one parent to another (without tracked)
+        -   book.AuthorId=3
+        -   new Authors.Books.Add (book)
+        -   book.Author=newAuthor
+
+    -   Option relationships
+        -   book.AuthorId=null
+        -   author.Books.Remove(book)
+
+
+
+
+
+
+
+

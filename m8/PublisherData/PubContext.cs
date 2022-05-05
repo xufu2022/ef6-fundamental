@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PublisherDomain;
+using Microsoft.Extensions.Logging;
 
 namespace PublisherData
 {
@@ -10,17 +11,17 @@ namespace PublisherData
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(
-              "Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = PubDatabaseTEST"
-            //).LogTo(Console.WriteLine);
-            ).LogTo(Console.WriteLine,new[] {DbLoggerCategory.Database.Command.Name},Microsoft.Extensions.Logging.LogLevel.Information)
+            optionsBuilder.UseSqlServer( 
+              "Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = PubDatabaseM8"
+            ).LogTo(Console.WriteLine,
+                    new[] {DbLoggerCategory.Database.Command.Name},
+                    LogLevel.Information)
             .EnableSensitiveDataLogging();
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Author>().HasData(
                 new Author { AuthorId = 1, FirstName = "Rhoda", LastName = "Lerman" });
-
             var authorList = new Author[]{
                 new Author {AuthorId = 2, FirstName = "Ruth", LastName = "Ozeki" },
                 new Author {AuthorId = 3, FirstName = "Sofia", LastName = "Segovia" },
@@ -47,15 +48,15 @@ namespace PublisherData
             //   .HasMany(a => a.Books)
             //   .WithOne(b => b.Author)
             //   .HasForeignKey("AuthorId").IsRequired(false);
-          
 
-                    //example of a more advanced mapping to specify
-                    //a one to many between author and book when 
-                    //there are no navigation properties:
-                    //modelBuilder.Entity<Author>()
-                    //    .HasMany<Book>()
-                    //    .WithOne();
-                }
+
+            //example of a more advanced mapping to specify
+            //a one to many between author and book when 
+            //there are no navigation properties:
+            //modelBuilder.Entity<Author>()
+            //    .HasMany<Book>()
+            //    .WithOne();
+        }
 
     }
 }
