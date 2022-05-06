@@ -123,5 +123,25 @@ builder.Services.AddControllers()
 .AddJsonOptions(opt =>
                 opt.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
+code bolerplate generate //crud directly using tool
 
+# m15. test ef core
 
+set up testdb
+
+        var builder=new DbContextOptionsBuilder<PubContext>();
+            builder.UseSqlServer(
+                "Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = PubTestData");
+            using (var context = new PubContext(builder.Options))
+            {
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+                ...
+            }
+
+InMemory database:
+
+        var builder = new DbContextOptionsBuilder<PubContext>();
+                    builder.UseInMemoryDatabase(
+                        Guid.NewGuid().ToString());
+        Assert.AreEqual(EntityState.Added, context.Entry(author).State);
