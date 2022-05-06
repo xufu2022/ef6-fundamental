@@ -117,7 +117,11 @@ Keyless entities will never be tracked, and find method won't work
     DbContext.Database.ExecuteSqlInterpolatedAsync
 
 
+# m14. AspnetCore
 
+builder.Services.AddControllers()
+.AddJsonOptions(opt =>
+                opt.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 
 
